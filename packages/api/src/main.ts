@@ -8,41 +8,17 @@ const app = fastify({
 
 // Add CORS headers using onSend hook as requested
 app.addHook('onSend', (request, reply, payload, done) => {
-  const origin = request.headers.origin;
-  const allowedOrigins = [
-    'https://extndly.com',
-    'https://www.extndly.com',
-    'http://localhost:3000', // For development
-    'http://localhost:5173'  // For Vite dev server
-  ];
-  
-  if (origin && allowedOrigins.includes(origin)) {
-    reply.header('Access-Control-Allow-Origin', origin);
-  }
-  
+  reply.header('Access-Control-Allow-Origin', '*');
   reply.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   reply.header('Access-Control-Allow-Headers', 'Content-Type');
-  reply.header('Access-Control-Allow-Credentials', 'false');
   done();
 });
 
 // Handle preflight OPTIONS requests
 app.options('*', async (request, reply) => {
-  const origin = request.headers.origin;
-  const allowedOrigins = [
-    'https://extndly.com',
-    'https://www.extndly.com',
-    'http://localhost:3000', // For development
-    'http://localhost:5173'  // For Vite dev server
-  ];
-  
-  if (origin && allowedOrigins.includes(origin)) {
-    reply.header('Access-Control-Allow-Origin', origin);
-  }
-  
+  reply.header('Access-Control-Allow-Origin', '*');
   reply.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
   reply.header('Access-Control-Allow-Headers', 'Content-Type');
-  reply.header('Access-Control-Allow-Credentials', 'false');
   reply.status(200).send();
 });
 
