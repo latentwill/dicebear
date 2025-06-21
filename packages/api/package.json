@@ -1,0 +1,22 @@
+{
+  "name": "@dicebear/api",
+  "version": "1.0.0",
+  "description": "Dicebear API server with CORS support",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.24.3",
+    "@fastify/cors": "^8.4.0",
+    "@dicebear/collection": "file:../@dicebear/collection",
+    "@dicebear/core": "file:../@dicebear/core"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.2",
+    "@types/node": "^20.9.0",
+    "ts-node": "^10.9.1"
+  }
+}
