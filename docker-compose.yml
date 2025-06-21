@@ -2,8 +2,6 @@ services:
   dicebear:
     image: dicebear/api:2
     restart: always
-    ports:
-      - '3002:3000'
     tmpfs:
       - '/run'
       - '/tmp'
