@@ -22,11 +22,40 @@ await app.register(import('@fastify/rate-limit'), {
 
 // Security headers
 app.addHook('onSend', (request, reply, payload, done) => {
-  // CORS - Consider restricting to specific domains in production
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['*'];
+  // CORS - Allow extndly.com subdomains and configured origins
+  const configuredOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
   const origin = request.headers.origin;
   
-  if (allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin))) {
+  // Check if origin is allowed
+  let isAllowed = false;
+  
+  if (origin) {
+    // Check configured origins first (including wildcard)
+    if (configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
+      isAllowed = true;
+    } else {
+      // Check if it's extndly.com or any subdomain of extndly.com
+      try {
+        const url = new URL(origin);
+        if (url.hostname === 'extndly.com' || url.hostname.endsWith('.extndly.com')) {
+          isAllowed = true;
+        }
+      } catch (error) {
+        // Invalid URL, not allowed
+        isAllowed = false;
+      }
+      
+      // Also check localhost for development
+      if (!isAllowed && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        isAllowed = true;
+      }
+    }
+  } else if (configuredOrigins.includes('*')) {
+    // Allow wildcard if configured
+    isAllowed = true;
+  }
+  
+  if (isAllowed) {
     reply.header('Access-Control-Allow-Origin', origin || '*');
   }
   
@@ -64,10 +93,39 @@ function validateAvatarOptions(options: Record<string, any>): Record<string, any
 
 // Handle preflight OPTIONS requests
 app.options('*', async (request, reply) => {
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['*'];
+  const configuredOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
   const origin = request.headers.origin;
   
-  if (allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin))) {
+  // Check if origin is allowed (same logic as onSend hook)
+  let isAllowed = false;
+  
+  if (origin) {
+    // Check configured origins first (including wildcard)
+    if (configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
+      isAllowed = true;
+    } else {
+      // Check if it's extndly.com or any subdomain of extndly.com
+      try {
+        const url = new URL(origin);
+        if (url.hostname === 'extndly.com' || url.hostname.endsWith('.extndly.com')) {
+          isAllowed = true;
+        }
+      } catch (error) {
+        // Invalid URL, not allowed
+        isAllowed = false;
+      }
+      
+      // Also check localhost for development
+      if (!isAllowed && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+        isAllowed = true;
+      }
+    }
+  } else if (configuredOrigins.includes('*')) {
+    // Allow wildcard if configured
+    isAllowed = true;
+  }
+  
+  if (isAllowed) {
     reply.header('Access-Control-Allow-Origin', origin || '*');
   }
   

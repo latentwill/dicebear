@@ -10,13 +10,32 @@ const app = fastify({
 app.addHook('onSend', (request, reply, payload, done) => {
   const origin = request.headers.origin;
   const allowedOrigins = [
-    'https://extndly.com',
-    'https://www.extndly.com',
     'http://localhost:3000', // For development
     'http://localhost:5173'  // For Vite dev server
   ];
   
-  if (origin && allowedOrigins.includes(origin)) {
+  // Check if origin is allowed (either in allowedOrigins or a subdomain of extndly.com)
+  let isAllowed = false;
+  
+  if (origin) {
+    // Check exact matches first
+    if (allowedOrigins.includes(origin)) {
+      isAllowed = true;
+    } else {
+      // Check if it's extndly.com or any subdomain of extndly.com
+      try {
+        const url = new URL(origin);
+        if (url.hostname === 'extndly.com' || url.hostname.endsWith('.extndly.com')) {
+          isAllowed = true;
+        }
+      } catch (error) {
+        // Invalid URL, not allowed
+        isAllowed = false;
+      }
+    }
+  }
+  
+  if (isAllowed) {
     reply.header('Access-Control-Allow-Origin', origin);
   }
   
@@ -30,13 +49,32 @@ app.addHook('onSend', (request, reply, payload, done) => {
 app.options('*', async (request, reply) => {
   const origin = request.headers.origin;
   const allowedOrigins = [
-    'https://extndly.com',
-    'https://www.extndly.com',
     'http://localhost:3000', // For development
     'http://localhost:5173'  // For Vite dev server
   ];
   
-  if (origin && allowedOrigins.includes(origin)) {
+  // Check if origin is allowed (either in allowedOrigins or a subdomain of extndly.com)
+  let isAllowed = false;
+  
+  if (origin) {
+    // Check exact matches first
+    if (allowedOrigins.includes(origin)) {
+      isAllowed = true;
+    } else {
+      // Check if it's extndly.com or any subdomain of extndly.com
+      try {
+        const url = new URL(origin);
+        if (url.hostname === 'extndly.com' || url.hostname.endsWith('.extndly.com')) {
+          isAllowed = true;
+        }
+      } catch (error) {
+        // Invalid URL, not allowed
+        isAllowed = false;
+      }
+    }
+  }
+  
+  if (isAllowed) {
     reply.header('Access-Control-Allow-Origin', origin);
   }
   
