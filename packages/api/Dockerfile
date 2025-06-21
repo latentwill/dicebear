@@ -18,8 +18,11 @@ RUN npm install
 # Copy source code
 COPY packages/ ./packages/
 
-# Build all packages using lerna (includes API)
-RUN npm run build
+# Build packages in dependency order using lerna
+RUN echo "=== Starting build process ===" && \
+    echo "Building packages in topological order..." && \
+    npx lerna run build --stream --sort && \
+    echo "=== Build process completed ==="
 
 # Remove devDependencies to reduce image size
 RUN npm prune --production
