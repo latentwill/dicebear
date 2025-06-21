@@ -11,7 +11,7 @@ const app = fastify({
 await app.register(import('@fastify/rate-limit'), {
   max: 100, // 100 requests
   timeWindow: '1 minute', // per minute
-  errorResponseBuilder: function (request, context) {
+  errorResponseBuilder: function (request: any, context: any) {
     return {
       code: 429,
       error: 'Too Many Requests',

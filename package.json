@@ -5,6 +5,7 @@
     "packages": [
       "packages/dicebear",
       "packages/@dicebear/*",
+      "packages/api",
       "apps/*"
     ]
   },
