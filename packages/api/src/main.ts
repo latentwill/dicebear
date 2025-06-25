@@ -89,6 +89,16 @@ app.get('/health', async (request, reply) => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
+// Helper function to convert dash-separated names to camelCase
+function dashToCamelCase(str: string): string {
+  return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+}
+
+// Helper function to convert camelCase names to dash-separated
+function camelCaseToDash(str: string): string {
+  return str.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
 // Avatar generation endpoint
 app.get('/:version/:style/:format', async (request, reply) => {
   const { version, style, format } = request.params as {
@@ -98,8 +108,11 @@ app.get('/:version/:style/:format', async (request, reply) => {
   };
 
   try {
+    // Convert dash-separated style name to camelCase for collection lookup
+    const camelCaseStyle = dashToCamelCase(style);
+    
     // Get the style from the collection
-    const styleModule = (collection as any)[style];
+    const styleModule = (collection as any)[camelCaseStyle];
     
     if (!styleModule) {
       reply.status(404).send({ error: 'Style not found' });
@@ -133,7 +146,9 @@ app.get('/:version/:style/:format', async (request, reply) => {
 
 // List available styles
 app.get('/styles', async (request, reply) => {
-  const styles = Object.keys(collection);
+  const camelCaseStyles = Object.keys(collection);
+  // Convert camelCase style names to dash-separated format for API consistency
+  const styles = camelCaseStyles.map(style => camelCaseToDash(style));
   return { styles };
 });
 

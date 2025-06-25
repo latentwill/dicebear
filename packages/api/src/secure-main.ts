@@ -91,6 +91,16 @@ function validateAvatarOptions(options: Record<string, any>): Record<string, any
   return validatedOptions;
 }
 
+// Helper function to convert dash-separated names to camelCase
+function dashToCamelCase(str: string): string {
+  return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+}
+
+// Helper function to convert camelCase names to dash-separated
+function camelCaseToDash(str: string): string {
+  return str.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
 // Handle preflight OPTIONS requests
 app.options('*', async (request, reply) => {
   const configuredOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
@@ -148,9 +158,12 @@ app.get('/:version/:style/:format', async (request, reply) => {
   };
 
   try {
+    // Convert dash-separated style name to camelCase for collection lookup
+    const camelCaseStyle = dashToCamelCase(style);
+    
     // Validate style parameter against known styles
     const availableStyles = Object.keys(collection);
-    if (!availableStyles.includes(style)) {
+    if (!availableStyles.includes(camelCaseStyle)) {
       reply.status(404).send({ error: 'Style not found' });
       return;
     }
@@ -165,8 +178,8 @@ app.get('/:version/:style/:format', async (request, reply) => {
     const rawOptions = request.query as Record<string, any>;
     const options = validateAvatarOptions(rawOptions);
     
-    // Get the style module
-    const styleModule = (collection as any)[style];
+    // Get the style module using camelCase name
+    const styleModule = (collection as any)[camelCaseStyle];
     
     // Create the avatar with validated options
     const avatar = createAvatar(styleModule, options);
@@ -193,7 +206,9 @@ app.get('/:version/:style/:format', async (request, reply) => {
 
 // List available styles
 app.get('/styles', async (request, reply) => {
-  const styles = Object.keys(collection);
+  const camelCaseStyles = Object.keys(collection);
+  // Convert camelCase style names to dash-separated format for API consistency
+  const styles = camelCaseStyles.map(style => camelCaseToDash(style));
   reply.header('Cache-Control', 'public, max-age=86400'); // 24 hour cache
   return { styles };
 });
