@@ -7,19 +7,22 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "ts-node --esm src/main.ts"
+    "dev": "ts-node --esm src/main.ts",
+    "dev:optimized": "ts-node --esm src/optimized-main.ts"
   },
   "dependencies": {
     "fastify": "^4.24.3",
     "@fastify/cors": "^8.4.0",
     "@fastify/rate-limit": "^9.1.0",
+    "@fastify/compress": "^6.5.0",
     "@dicebear/collection": "file:../@dicebear/collection",
     "@dicebear/core": "file:../@dicebear/core"
   },
   "devDependencies": {
     "typescript": "^5.3.2",
     "@types/node": "^20.9.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "node-fetch": "^3.3.2"
   },
   "engines": {
     "node": ">=18.0.0"
